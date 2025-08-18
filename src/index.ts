@@ -27,7 +27,7 @@ app.get('/api/v1/health', (req,res)=> {
 
 app.use((req, _, next) => {
   console.log(`Request: ${req.method} ${req.originalUrl}`);
-  const err = new AppError(`Can't find ${req.originalUrl} on the server!`, 404);
+  const err = new AppError(`Can't find ${req.originalUrl} on the server! `, 404);
   next(err);
 });
 
