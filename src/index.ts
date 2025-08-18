@@ -1,0 +1,38 @@
+import dotenv from 'dotenv';
+dotenv.config();
+import express from 'express';
+import cors from 'cors';
+import { AppError, globalErrorHandler } from './utils/app-error';
+import userRouter from './modules/users/routes/routes';
+import cookieParser from 'cookie-parser';
+import organizationRouter from './modules/organization/routes/routes';
+
+const app = express();
+app.use(express.json());
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
+app.use(
+  cors({
+    origin: 'http://localhost:3000', // your frontend URL
+    credentials: true, // allow cookies to be sent
+  })
+);
+
+app.use('/api/v1/organization', organizationRouter);
+app.use('/api/v1/user', userRouter);
+app.get('/api/v1/health', (req,res)=> {
+  res.send('All Ok')
+
+});
+
+app.use((req, _, next) => {
+  console.log(`Request: ${req.method} ${req.originalUrl}`);
+  const err = new AppError(`Can't find ${req.originalUrl} on the server!`, 404);
+  next(err);
+});
+
+app.use(globalErrorHandler);
+
+app.listen(process.env.PORT, () => {
+  console.log(`Server is running on http://localhost:${process.env.PORT}`);
+});
