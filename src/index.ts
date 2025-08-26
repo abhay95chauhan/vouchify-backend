@@ -6,6 +6,7 @@ import { AppError, globalErrorHandler } from './utils/app-error';
 import userRouter from './modules/users/routes/routes';
 import cookieParser from 'cookie-parser';
 import organizationRouter from './modules/organization/routes/routes';
+import vouchersRouter from './modules/vouchers/routes/routes';
 
 const app = express();
 app.use(express.json());
@@ -20,6 +21,8 @@ app.use(
 
 app.use('/api/v1/organization', organizationRouter);
 app.use('/api/v1/user', userRouter);
+app.use('/api/v1/voucher', vouchersRouter);
+
 app.get('/api/v1/health', (req,res)=> {
   res.send('All Ok')
 

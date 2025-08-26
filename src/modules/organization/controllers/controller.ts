@@ -5,6 +5,7 @@ import { catchAsync } from '../../../utils/catch-async';
 import { UserEntity } from '../../users/entity/entity';
 import { AppError } from '../../../utils/app-error';
 import { updateSubcriptionForFreePlan } from '../middleware/middleware';
+import { errorMessages } from '../../../utils/error-messages';
 
 const getMyOrganization = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -14,13 +15,13 @@ const getMyOrganization = catchAsync(
     });
 
     if (!resData) {
-      next(new AppError('Organization Not Found', 404));
+      next(new AppError(errorMessages.organization.error.notFound, 404));
       return;
     }
 
     return res.status(200).json({
       code: 200,
-      message: 'Organization Found',
+      message: errorMessages.organization.success.found,
       status: 'success',
       data: resData,
     });
@@ -45,7 +46,7 @@ const createOrganizations = catchAsync(
 
     res.status(200).json({
       code: 200,
-      message: 'Organization Created Succesfully!',
+      message: errorMessages.organization.success.create,
       status: 'success',
       data: savedOrganization,
     });
@@ -63,7 +64,7 @@ const updateMyOrganization = catchAsync(
 
     res.status(200).json({
       code: 200,
-      message: 'Organization Updated Succesfully!',
+      message: errorMessages.organization.success.update,
       status: 'success',
       data: savedOrganization,
     });

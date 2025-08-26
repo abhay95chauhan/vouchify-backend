@@ -26,7 +26,7 @@ export class OrganizationEntity {
   @Column({ type: 'varchar', length: 100, nullable: false, unique: true })
   slug!: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   description?: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
@@ -40,6 +40,9 @@ export class OrganizationEntity {
 
   @Column({ type: 'varchar', length: 100, nullable: false })
   currency!: string;
+
+  @Column({ type: 'varchar', length: 5, nullable: false })
+  currency_symbol!: string;
 
   @Column({ type: 'varchar', length: 100, nullable: false })
   timezone!: string;

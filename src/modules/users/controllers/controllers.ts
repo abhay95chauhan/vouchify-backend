@@ -5,6 +5,7 @@ import { UserEntity } from '../entity/entity';
 import { AppError } from '../../../utils/app-error';
 import bcrypt from 'bcryptjs';
 import jwt, { SignOptions } from 'jsonwebtoken';
+import { errorMessages } from '../../../utils/error-messages';
 
 // Extend Express Request interface to include 'user'
 declare global {
@@ -34,14 +35,14 @@ const loginUser = catchAsync(
     });
 
     if (!isExist) {
-      next(new AppError('Invalid email and password', 400));
+      next(new AppError(errorMessages.auth.error.login, 400));
       return;
     }
 
     const isMatch = await bcrypt.compare(password, isExist?.password);
 
     if (!isMatch) {
-      next(new AppError('Invalid email and password', 400));
+      next(new AppError(errorMessages.auth.error.login, 400));
       return;
     }
 
@@ -63,7 +64,7 @@ const loginUser = catchAsync(
 
     return res.status(200).json({
       code: 200,
-      message: 'User has Logged in',
+      message: errorMessages.auth.success.login,
       status: 'success',
       token,
       data: payload,
@@ -80,7 +81,7 @@ const createUser = catchAsync(
     });
 
     if (isExist) {
-      next(new AppError('User already Exist', 400));
+      next(new AppError(errorMessages.auth.error.create, 400));
       return;
     }
 
@@ -89,7 +90,7 @@ const createUser = catchAsync(
 
     res.status(200).json({
       code: 200,
-      message: 'User has been created',
+      message: errorMessages.auth.success.create,
       status: 'success',
       data: savedUser,
     });
@@ -103,7 +104,7 @@ const logout = async (_: Request, res: Response, next: NextFunction) => {
   });
   res.status(200).json({
     code: 200,
-    message: 'User has been logged out',
+    message: errorMessages.auth.success.logout,
     status: 'success',
   });
 };
@@ -162,13 +163,13 @@ const getMe = catchAsync(
     });
 
     if (!isExist) {
-      next(new AppError('User not found', 404));
+      next(new AppError(errorMessages.auth.error.notFound, 404));
       return;
     }
 
     res.status(200).json({
       code: 200,
-      message: 'User Found',
+      message: errorMessages.auth.success.found,
       status: 'success',
       data: isExist,
     });
