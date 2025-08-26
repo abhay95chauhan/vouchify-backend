@@ -28,30 +28,28 @@ const getMyOrganization = catchAsync(
   }
 );
 
-const createOrganizations = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const organizationRepo = AppDataSource.getRepository(OrganizationEntity);
-    const user = AppDataSource.getRepository(UserEntity);
+const createOrganizations = catchAsync(async (req: Request, res: Response) => {
+  const organizationRepo = AppDataSource.getRepository(OrganizationEntity);
+  const user = AppDataSource.getRepository(UserEntity);
 
-    const newOrganization = organizationRepo.create({
-      ...req.body,
-      email: req.user.email,
-    });
-    const savedOrganization: any = await organizationRepo.save(newOrganization); // actually saves to DB
+  const newOrganization = organizationRepo.create({
+    ...req.body,
+    email: req.user.email,
+  });
+  const savedOrganization: any = await organizationRepo.save(newOrganization); // actually saves to DB
 
-    await user.update(
-      { id: req.user.id }, // find which user to update
-      { organization_id: savedOrganization.id } // fields to update
-    );
+  await user.update(
+    { id: req.user.id }, // find which user to update
+    { organization_id: savedOrganization.id } // fields to update
+  );
 
-    res.status(200).json({
-      code: 200,
-      message: errorMessages.organization.success.create,
-      status: 'success',
-      data: savedOrganization,
-    });
-  }
-);
+  res.status(200).json({
+    code: 200,
+    message: errorMessages.organization.success.create,
+    status: 'success',
+    data: savedOrganization,
+  });
+});
 
 const updateMyOrganization = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {

@@ -30,6 +30,8 @@ export const errorMessages = {
     },
     error: {
       notFound: 'Voucher Not Found',
+      voucherExist:
+        'Voucher Already Exist with this Code, Please Change Code, Prefix or Postfix ',
     },
   },
   somethingWrong: 'Something went wrong',

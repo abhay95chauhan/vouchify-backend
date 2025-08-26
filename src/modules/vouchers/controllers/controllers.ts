@@ -7,8 +7,17 @@ import { AppError } from '../../../utils/app-error';
 import { errorMessages } from '../../../utils/error-messages';
 
 const createOrganizationVoucher = catchAsync(
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const voucherRepo = AppDataSource.getRepository(VouchersEntity);
+
+    const resData = await voucherRepo.findOneBy({
+      code: req.body.code,
+    });
+
+    if (resData) {
+      next(new AppError(errorMessages.voucher.error.voucherExist, 409));
+      return;
+    }
 
     const newVoucher = voucherRepo.create({
       ...req.body,
@@ -35,6 +44,7 @@ const getVoucherByCode = catchAsync(
     const voucherRepo = AppDataSource.getRepository(VouchersEntity);
     const resData = await voucherRepo.findOneBy({
       code: req.params.code,
+      organization_id: req.user.organization_id,
     });
 
     if (!resData) {
@@ -82,7 +92,12 @@ const getAllOrganizationVouchers = catchAsync(
     const skip = (page - 1) * limit;
 
     // 🔹 Build where condition
-    const where = search ? { code: ILike(`%${search}%`) } : {};
+    const where = search
+      ? {
+          code: ILike(`%${search}%`),
+          organization_id: req.user.organization_id,
+        }
+      : { organization_id: req.user.organization_id };
 
     // 🔹 Find with pagination & search
     const [data, total] = await vouchersRepo.findAndCount({
