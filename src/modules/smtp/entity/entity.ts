@@ -4,7 +4,10 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { OrganizationEntity } from '../../organization/entity/entity';
 
 @Entity({ name: 'smtp_settings', schema: 'public' })
 export class SmtpSettingsEntity {
@@ -37,6 +40,13 @@ export class SmtpSettingsEntity {
 
   @Column({ type: 'varchar', length: 255, nullable: false })
   password!: string; // ⚠️ store encrypted, not plain
+
+  // 🔑 Relation to organization
+  @ManyToOne(() => OrganizationEntity, {
+    onDelete: 'CASCADE', // 🚀 Auto-delete when org deleted
+  })
+  @JoinColumn({ name: 'organization_id' })
+  organization!: OrganizationEntity;
 
   // Optional organization-level scoping
   @Column({ type: 'uuid', nullable: false, unique: true })

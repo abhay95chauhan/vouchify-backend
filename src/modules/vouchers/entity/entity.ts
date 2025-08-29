@@ -4,8 +4,11 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { discountType, redeemPerUser } from '../helpers/config';
+import { OrganizationEntity } from '../../organization/entity/entity';
 
 @Entity({ name: 'vouchers', schema: 'public' })
 export class VouchersEntity {
@@ -52,6 +55,12 @@ export class VouchersEntity {
 
   @CreateDateColumn({ type: 'date' })
   end_date!: string;
+
+  @ManyToOne(() => OrganizationEntity, {
+    onDelete: 'CASCADE', // 🚀 Auto-delete when org deleted
+  })
+  @JoinColumn({ name: 'organization_id' })
+  organization!: OrganizationEntity;
 
   @Column({ type: 'uuid', nullable: false })
   organization_id!: string; // 👈 plain column

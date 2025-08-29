@@ -3,6 +3,7 @@ import { OrganizationEntity } from './modules/organization/entity/entity';
 import { UserEntity } from './modules/users/entity/entity';
 import { VouchersEntity } from './modules/vouchers/entity/entity';
 import { SmtpSettingsEntity } from './modules/smtp/entity/entity';
+import { ApiKeyEntity } from './modules/api-key/entity/entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -20,6 +21,7 @@ export const AppDataSource = new DataSource({
     OrganizationEntity,
     VouchersEntity,
     SmtpSettingsEntity,
+    ApiKeyEntity,
   ],
   migrations: ['src/migration/**/*.ts'],
 } as DataSourceOptions);

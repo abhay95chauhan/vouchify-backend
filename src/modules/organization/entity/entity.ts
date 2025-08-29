@@ -5,12 +5,15 @@ import {
   UpdateDateColumn,
   CreateDateColumn,
   BeforeInsert,
+  JoinColumn,
+  OneToOne,
 } from 'typeorm';
 import {
   subcriptionCost,
   subcriptions,
   subcriptionStatus,
 } from '../helpers/config';
+import { ApiKeyEntity } from '../../api-key/entity/entity';
 
 @Entity({ name: 'organization', schema: 'public' })
 export class OrganizationEntity {
@@ -47,15 +50,12 @@ export class OrganizationEntity {
   @Column({ type: 'varchar', length: 100, nullable: false })
   timezone!: string;
 
-  @Column({ type: 'varchar', default: 'api_adad4awd5456aw4', nullable: false })
-  api_key!: string;
+  @Column({ type: 'uuid', nullable: true })
+  api_key_id?: string; // 👈 plain column
 
-  @Column({
-    type: 'varchar',
-    default: 'adad4awd5456aw4_secret',
-    nullable: false,
-  })
-  api_secret!: string;
+  @OneToOne(() => ApiKeyEntity, { nullable: true })
+  @JoinColumn({ name: 'api_key_id' })
+  api_keys?: ApiKeyEntity;
 
   @Column({
     type: 'enum',
