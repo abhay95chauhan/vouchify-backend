@@ -29,7 +29,7 @@ export class SmtpSettingsEntity {
   @Column({ type: 'int', nullable: false })
   port!: number;
 
-  @Column({ type: 'boolean', default: true })
+  @Column({ type: 'boolean', default: false })
   secure!: boolean; // true for 465, false for other ports
 
   @Column({ type: 'varchar', length: 255, nullable: false })
@@ -39,7 +39,7 @@ export class SmtpSettingsEntity {
   password!: string; // ⚠️ store encrypted, not plain
 
   // Optional organization-level scoping
-  @Column({ type: 'uuid', nullable: false })
+  @Column({ type: 'uuid', nullable: false, unique: true })
   organization_id!: string;
 
   @CreateDateColumn({ type: 'timestamptz' })

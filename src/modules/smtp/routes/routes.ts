@@ -8,6 +8,5 @@ smtpSettingsRouter.use(userController.protect);
 
 smtpSettingsRouter.post('/', smtpController.smtpConfigure);
 smtpSettingsRouter.get('/', smtpController.getOrgnizationSmtpConfiguration);
-smtpSettingsRouter.patch('/', smtpController.updateSmtpConfiguration);
 
 export default smtpSettingsRouter;
