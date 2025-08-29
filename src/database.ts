@@ -2,6 +2,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { OrganizationEntity } from './modules/organization/entity/entity';
 import { UserEntity } from './modules/users/entity/entity';
 import { VouchersEntity } from './modules/vouchers/entity/entity';
+import { SmtpSettingsEntity } from './modules/smtp/entity/entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -14,7 +15,12 @@ export const AppDataSource = new DataSource({
   synchronize: true, // Set to false in production
   logging: true,
   ssl: false,
-  entities: [UserEntity, OrganizationEntity, VouchersEntity],
+  entities: [
+    UserEntity,
+    OrganizationEntity,
+    VouchersEntity,
+    SmtpSettingsEntity,
+  ],
   migrations: ['src/migration/**/*.ts'],
 } as DataSourceOptions);
 

@@ -62,19 +62,56 @@ const getVoucherByCode = catchAsync(
 );
 
 const updateOrganizationVoucher = catchAsync(
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const voucherRepo = AppDataSource.getRepository(VouchersEntity);
 
-    const savedVoucher = await voucherRepo.update(
-      { code: req.params.code },
-      { ...req.body }
-    );
+    const existVoucherData = await voucherRepo.findOneBy({
+      code: req.params.code,
+      organization_id: req.user.organization_id,
+    });
+
+    if (!existVoucherData) {
+      next(new AppError(errorMessages.voucher.error.notFound, 404));
+      return;
+    }
+
+    await voucherRepo.update({ code: req.params.code }, { ...req.body });
 
     res.status(200).json({
       code: 200,
       message: errorMessages.voucher.success.update,
       status: 'success',
-      data: savedVoucher,
+      data: existVoucherData,
+    });
+  }
+);
+
+const deleteOrganizationVoucher = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.params.code) {
+      next(new AppError(errorMessages.voucher.error.notFound, 404));
+      return;
+    }
+
+    const voucherRepo = AppDataSource.getRepository(VouchersEntity);
+
+    const existVoucherData = await voucherRepo.findOneBy({
+      code: req.params.code,
+      organization_id: req.user.organization_id,
+    });
+
+    if (!existVoucherData) {
+      next(new AppError(errorMessages.voucher.error.notFound, 404));
+      return;
+    }
+
+    await voucherRepo.delete({ code: req.params.code });
+
+    res.status(200).json({
+      code: 200,
+      message: errorMessages.voucher.success.delete,
+      status: 'success',
+      data: existVoucherData,
     });
   }
 );
@@ -124,4 +161,5 @@ export const vouchersController = {
   createOrganizationVoucher,
   getVoucherByCode,
   updateOrganizationVoucher,
+  deleteOrganizationVoucher,
 };

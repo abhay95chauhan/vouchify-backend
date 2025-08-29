@@ -10,5 +10,6 @@ vouchersRouter.get('/list', vouchersController.getAllOrganizationVouchers);
 vouchersRouter.post('/', vouchersController.createOrganizationVoucher);
 vouchersRouter.get('/:code', vouchersController.getVoucherByCode);
 vouchersRouter.patch('/:code', vouchersController.updateOrganizationVoucher);
+vouchersRouter.delete('/:code', vouchersController.deleteOrganizationVoucher);
 
 export default vouchersRouter;

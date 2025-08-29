@@ -27,11 +27,23 @@ export const errorMessages = {
       found: 'Voucher Found',
       create: 'Voucher Created Successfully',
       update: 'Voucher Updated Successfully',
+      delete: 'Voucher Deleted Successfully',
     },
     error: {
       notFound: 'Voucher Not Found',
       voucherExist:
         'Voucher Already Exist with this Code, Please Change Code, Prefix or Postfix ',
+    },
+  },
+  smtp: {
+    success: {
+      configure: 'SMTP Configured',
+      updateConfiguration: 'SMTP Configuration Updated',
+      found: 'SMTP Configuration Found',
+    },
+    error: {
+      alreadyConfigure: 'SMTP Already Configured',
+      notFound: 'SMTP Configuration Not Found',
     },
   },
   somethingWrong: 'Something went wrong',
