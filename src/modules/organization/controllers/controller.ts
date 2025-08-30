@@ -48,8 +48,8 @@ const createOrganizations = catchAsync(async (req: Request, res: Response) => {
   // 2. Create api key for this org
   await apiKeyRepo.upsert(
     {
-      api_key: `api_${crypto.randomUUID()}`,
-      api_secret: `secret_${crypto.randomUUID()}`,
+      api_key: `api-${crypto.randomUUID()}`,
+      api_secret: `sk-${crypto.randomUUID()}`,
       organization_id: savedOrganization.id,
       user_id: req.user.id,
     },
