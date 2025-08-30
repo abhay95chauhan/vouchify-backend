@@ -6,6 +6,7 @@ import { AppError } from '../../../utils/app-error';
 import bcrypt from 'bcryptjs';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { errorMessages } from '../../../utils/error-messages';
+import { ApiKeyEntity } from '../../api-key/entity/entity';
 
 // Extend Express Request interface to include 'user'
 declare global {
@@ -111,31 +112,47 @@ const logout = async (_: Request, res: Response, next: NextFunction) => {
 
 const protect = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    // 1) Getting token and check of it's there
-    let token;
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith('Bearer')
-    ) {
-      token = req.headers.authorization.split(' ')[1];
+    const apiKey = req.headers['x-api-key'] as string | undefined;
+    const apiSecret = req.headers['x-api-secret'] as string | undefined;
+
+    let savedApiKey: ApiKeyEntity | null = null;
+    let token: string | undefined;
+
+    if (apiKey && apiSecret) {
+      const apiKeyRepo = AppDataSource.getRepository(ApiKeyEntity);
+      savedApiKey = await apiKeyRepo.findOneBy({
+        api_key: apiKey,
+        api_secret: apiSecret,
+      });
+
+      if (!savedApiKey) {
+        return next(new AppError('Invalid API Key and API Secret!', 401));
+      }
     } else if (req.cookies.jwt) {
       token = req.cookies.jwt;
     }
 
-    if (!token) {
+    if (!token && !savedApiKey) {
       return next(
         new AppError('You are not logged in! Please log in to get access.', 401)
       );
     }
 
-    // 2) Verification token
-    const decoded: any = await jwt.verify(token, JWT_SECRET);
+    let userId: string | undefined;
 
-    // 3) Check if user still exists
-    const user = await AppDataSource.getRepository(UserEntity);
-    const currentUser = await user.findOne({
-      where: { id: decoded?.id },
-    });
+    if (savedApiKey) {
+      userId = savedApiKey.user_id;
+    } else if (token) {
+      const decoded: any = jwt.verify(token, JWT_SECRET);
+      userId = decoded?.id;
+    }
+
+    if (!userId) {
+      return next(new AppError('Authentication failed!', 401));
+    }
+
+    const userRepo = AppDataSource.getRepository(UserEntity);
+    const currentUser = await userRepo.findOne({ where: { id: userId } });
 
     if (!currentUser) {
       return next(

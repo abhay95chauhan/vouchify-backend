@@ -8,7 +8,7 @@ export const errorMessages = {
     },
     error: {
       create: 'User Already Exist',
-      login: 'Invalid email and password',
+      login: 'Invalid Email and Password',
       notFound: 'User not found',
     },
   },
