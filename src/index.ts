@@ -8,8 +8,27 @@ import cookieParser from 'cookie-parser';
 import organizationRouter from './modules/organization/routes/routes';
 import vouchersRouter from './modules/vouchers/routes/routes';
 import smtpSettingsRouter from './modules/smtp/routes/routes';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
+
+// const limiter = rateLimit({
+//   max: 5, // max requests
+//   windowMs: 60 * 60 * 1000, // 1 hour
+//   handler: (req, res, next, options) => {
+//     // You can fully customize this response
+//     return res.status(options.statusCode).json({
+//       code: 429,
+//       status: 'error',
+//       message: `You have exceeded the ${options.max} requests in ${
+//         options.windowMs / (60 * 1000)
+//       } minutes limit.`,
+//       retryAfter: `${Math.ceil(options.windowMs / (60 * 1000))} minutes`,
+//     });
+//   },
+// });
 
 const app = express();
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
@@ -19,6 +38,10 @@ app.use(
     credentials: true, // allow cookies to be sent
   })
 );
+
+app.use(helmet());
+
+// app.use('/api', limiter);
 
 app.use('/api/v1/organization', organizationRouter);
 app.use('/api/v1/user', userRouter);
