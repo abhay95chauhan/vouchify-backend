@@ -31,8 +31,12 @@ export const errorMessages = {
     },
     error: {
       notFound: 'Voucher Not Found',
+      invalidCode: 'Invalid Code',
       voucherExist:
         'Voucher Already Exist with this Code, Please Change Code, Prefix or Postfix ',
+      voucherNotActive: 'Voucher not yet Active',
+      voucherExpired: 'Voucher has been Expired',
+      voucherLimitExceeded: 'Voucher Redemption Limit Reached',
     },
   },
   smtp: {
@@ -44,6 +48,17 @@ export const errorMessages = {
     error: {
       alreadyConfigure: 'SMTP Already Configured',
       notFound: 'SMTP Configuration Not Found',
+    },
+  },
+  emailTemplates: {
+    success: {
+      create: 'Template Created Successfully',
+      found: 'Template Found',
+      update: 'Template Updated Successfully',
+      delete: 'Template Deleted Successfully',
+    },
+    error: {
+      notFound: 'Template Not Found',
     },
   },
   somethingWrong: 'Something went wrong',

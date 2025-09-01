@@ -5,6 +5,8 @@ import { VouchersEntity } from '../entity/entity';
 import { ILike } from 'typeorm';
 import { AppError } from '../../../utils/app-error';
 import { errorMessages } from '../../../utils/error-messages';
+import moment from 'moment-timezone';
+import { discountType, redeemPerUser } from '../helpers/config';
 
 const createOrganizationVoucher = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -25,8 +27,8 @@ const createOrganizationVoucher = catchAsync(
     });
     const savedVoucher: any = await voucherRepo.save(newVoucher); // actually saves to DB
 
-    res.status(200).json({
-      code: 200,
+    res.status(201).json({
+      code: 201,
       message: errorMessages.voucher.success.create,
       status: 'success',
       data: savedVoucher,
@@ -107,11 +109,95 @@ const deleteOrganizationVoucher = catchAsync(
 
     await voucherRepo.delete({ code: req.params.code });
 
-    res.status(200).json({
-      code: 200,
+    res.status(204).json({
+      code: 204,
       message: errorMessages.voucher.success.delete,
       status: 'success',
-      data: existVoucherData,
+      data: {},
+    });
+  }
+);
+
+const validateVoucherByCode = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { code, orderAmount, currencySymbol } = req.body;
+
+    if (!code) {
+      next(new AppError(errorMessages.voucher.error.invalidCode, 404));
+      return;
+    }
+
+    const voucherRepo = AppDataSource.getRepository(VouchersEntity);
+    const voucherData = await voucherRepo.findOneBy({
+      code: code,
+      organization_id: req.user.organization_id,
+    });
+
+    if (!voucherData) {
+      next(new AppError(errorMessages.voucher.error.invalidCode, 404));
+      return;
+    }
+
+    const now = moment.tz(req.user?.organization?.timezone)?.startOf('day'); // current time
+    const start = moment(voucherData.start_date)?.startOf('day');
+    const end = moment(voucherData.end_date)?.endOf('day'); // 👈 extend to end of day
+
+    if (now?.isBefore(start)) {
+      next(new AppError(errorMessages.voucher.error.voucherNotActive, 400));
+      return;
+    }
+
+    if (now?.isAfter(end)) {
+      next(new AppError(errorMessages.voucher.error.voucherExpired, 400));
+      return;
+    }
+
+    if (
+      voucherData.max_redemptions &&
+      voucherData.redemption_count >= voucherData.max_redemptions
+    ) {
+      next(new AppError(errorMessages.voucher.error.voucherLimitExceeded, 400));
+      return;
+    }
+
+    if (orderAmount < voucherData.min_order_amount) {
+      next(
+        new AppError(
+          `Amount must be at least ${currencySymbol} ${voucherData.min_order_amount} to use this voucher`,
+          400
+        )
+      );
+      return;
+    }
+
+    // if (voucherData.redeem_limit_per_user === redeemPerUser[0]) {
+
+    // }
+
+    // ✅ Calculate discount
+    let discount = 0;
+    if (voucherData.discount_type === discountType[1]) {
+      discount = (orderAmount * voucherData.discount_value) / 100;
+      if (
+        voucherData.max_discount_amount &&
+        discount > voucherData.max_discount_amount
+      ) {
+        discount = voucherData.max_discount_amount;
+      }
+    } else {
+      discount = voucherData.discount_value;
+    }
+
+    return res.status(200).json({
+      code: 200,
+      message: errorMessages.voucher.success.found,
+      status: 'success',
+      data: {
+        discount,
+        finalAmount: orderAmount - discount,
+        orderAmount,
+        voucherData,
+      },
     });
   }
 );
@@ -162,4 +248,5 @@ export const vouchersController = {
   getVoucherByCode,
   updateOrganizationVoucher,
   deleteOrganizationVoucher,
+  validateVoucherByCode,
 };

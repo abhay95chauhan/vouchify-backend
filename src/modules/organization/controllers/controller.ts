@@ -90,10 +90,14 @@ const updateMyOrganization = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const organizationRepo = AppDataSource.getRepository(OrganizationEntity);
 
-    const savedOrganization = await organizationRepo.update(
+    await organizationRepo.update(
       { id: req.user.organization_id },
       { ...req.body }
     );
+
+    const savedOrganization = await organizationRepo.findOne({
+      where: { id: req.user.organization_id },
+    });
 
     res.status(200).json({
       code: 200,
