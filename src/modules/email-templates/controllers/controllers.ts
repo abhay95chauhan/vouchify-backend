@@ -147,7 +147,7 @@ const getAllEmailTemplates = catchAsync(async (req: Request, res: Response) => {
 
   return res.status(200).json({
     code: 200,
-    message: errorMessages.emailTemplates.success.delete,
+    message: errorMessages.emailTemplates.success.list,
     status: 'success',
     data,
     pagination: {

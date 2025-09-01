@@ -6,10 +6,7 @@ const emailTemplatesRouter = express.Router();
 
 emailTemplatesRouter.use(userController.protect);
 
-emailTemplatesRouter.post(
-  '/list',
-  emailTemplateController.getAllEmailTemplates
-);
+emailTemplatesRouter.get('/list', emailTemplateController.getAllEmailTemplates);
 emailTemplatesRouter.post('/', emailTemplateController.createEmailTemplate);
 emailTemplatesRouter.get('/:id', emailTemplateController.getEmailTemplateById);
 emailTemplatesRouter.patch('/:id', emailTemplateController.updateEmailTemplate);

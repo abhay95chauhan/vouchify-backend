@@ -4,6 +4,7 @@ import { UserEntity } from './modules/users/entity/entity';
 import { VouchersEntity } from './modules/vouchers/entity/entity';
 import { SmtpSettingsEntity } from './modules/smtp/entity/entity';
 import { ApiKeyEntity } from './modules/api-key/entity/entity';
+import { EmailTemplatesEntity } from './modules/email-templates/entity/entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -22,6 +23,7 @@ export const AppDataSource = new DataSource({
     VouchersEntity,
     SmtpSettingsEntity,
     ApiKeyEntity,
+    EmailTemplatesEntity,
   ],
   migrations: ['src/migration/**/*.ts'],
 } as DataSourceOptions);

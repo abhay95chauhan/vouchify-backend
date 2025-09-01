@@ -56,6 +56,7 @@ export const errorMessages = {
       found: 'Template Found',
       update: 'Template Updated Successfully',
       delete: 'Template Deleted Successfully',
+      list: 'Email Templates Fetched',
     },
     error: {
       notFound: 'Template Not Found',
