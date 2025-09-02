@@ -109,11 +109,11 @@ const deleteOrganizationVoucher = catchAsync(
 
     await voucherRepo.delete({ code: req.params.code });
 
-    res.status(204).json({
-      code: 204,
+    res.status(200).json({
+      code: 200,
       message: errorMessages.voucher.success.delete,
       status: 'success',
-      data: {},
+      data: existVoucherData,
     });
   }
 );

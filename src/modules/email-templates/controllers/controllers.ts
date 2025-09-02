@@ -107,11 +107,11 @@ const deleteEmailTemplate = catchAsync(
 
     await emailTemplateRepo.delete({ id: req.params.id });
 
-    res.status(204).json({
-      code: 204,
+    res.status(200).json({
+      code: 200,
       message: errorMessages.emailTemplates.success.delete,
       status: 'success',
-      data: {},
+      data: existTemplateData,
     });
   }
 );
@@ -131,8 +131,6 @@ const getAllEmailTemplates = catchAsync(async (req: Request, res: Response) => {
   const where = search
     ? {
         name: ILike(`%${search}%`),
-        subject: ILike(`%${search}%`),
-        category: ILike(`%${search}%`),
         organization_id: req.user.organization_id,
       }
     : { organization_id: req.user.organization_id };
@@ -140,7 +138,7 @@ const getAllEmailTemplates = catchAsync(async (req: Request, res: Response) => {
   // 🔹 Find with pagination & search
   const [data, total] = await emailTemplateRepo.findAndCount({
     where,
-    order: { updated_at: 'ASC' },
+    order: { updated_at: 'desc' },
     take: limit,
     skip,
   });
