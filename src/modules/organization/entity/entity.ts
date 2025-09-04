@@ -8,9 +8,12 @@ import {
   JoinColumn,
   OneToOne,
 } from 'typeorm';
-import { subcriptionStatus } from '../helpers/config';
 import { ApiKeyEntity } from '../../api-key/entity/entity';
 import { SubcriptionsEntity } from '../../subcriptions/entity/entity';
+import {
+  subcriptionPeriod,
+  subcriptionStatus,
+} from '../../subcriptions/helpers/config';
 
 @Entity({ name: 'organization', schema: 'public' })
 export class OrganizationEntity {
@@ -68,6 +71,14 @@ export class OrganizationEntity {
     enum: subcriptionStatus,
   })
   subcription_status!: string;
+
+  @Column({
+    type: 'enum',
+    nullable: false,
+    default: subcriptionPeriod[0],
+    enum: subcriptionPeriod,
+  })
+  subscription_period!: string;
 
   @Column({ type: 'timestamp' })
   subcription_expire!: Date;
