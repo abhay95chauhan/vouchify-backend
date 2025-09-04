@@ -62,5 +62,16 @@ export const errorMessages = {
       notFound: 'Template Not Found',
     },
   },
+  subcription: {
+    success: {
+      create: 'Subcription Created Successfully',
+      update: 'Subcription Updated Successfully',
+      delete: 'Subcription Deleted Successfully',
+      list: 'Subcriptions Fetched',
+    },
+    error: {
+      notFound: 'Subcription Not Found',
+    },
+  },
   somethingWrong: 'Something went wrong',
 };

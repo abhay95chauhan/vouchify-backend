@@ -15,7 +15,7 @@ const getMyOrganization = catchAsync(
       where: {
         id: req.user.organization_id,
       },
-      relations: ['api_keys'],
+      relations: ['api_keys', 'subcription'],
     });
 
     if (!resData) {
@@ -75,7 +75,7 @@ const createOrganizations = catchAsync(async (req: Request, res: Response) => {
 
   const updatedOrg = await organizationRepo.findOne({
     where: { id: savedOrganization.id },
-    relations: ['api_keys'],
+    relations: ['api_keys', 'subcription'],
   });
 
   res.status(200).json({

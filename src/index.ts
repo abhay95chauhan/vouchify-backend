@@ -11,6 +11,7 @@ import smtpSettingsRouter from './modules/smtp/routes/routes';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import emailTemplatesRouter from './modules/email-templates/routes/routes';
+import subcriptionRouter from './modules/subcriptions/routes/routes';
 
 // const limiter = rateLimit({
 //   max: 5, // max requests
@@ -49,6 +50,7 @@ app.use('/api/v1/user', userRouter);
 app.use('/api/v1/voucher', vouchersRouter);
 app.use('/api/v1/smtp', smtpSettingsRouter);
 app.use('/api/v1/email-templates', emailTemplatesRouter);
+app.use('/api/v1/subcriptions', subcriptionRouter);
 
 app.get('/api/v1/health', (_, res) => {
   res.send('All Ok');

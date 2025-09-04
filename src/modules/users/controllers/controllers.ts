@@ -176,7 +176,11 @@ const getMe = catchAsync(
 
     const isExist = await user.findOne({
       where: { id: req.user.id },
-      relations: ['organization'],
+      relations: [
+        'organization',
+        'organization.subcription',
+        'organization.api_keys',
+      ],
     });
 
     if (!isExist) {

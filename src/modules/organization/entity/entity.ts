@@ -8,12 +8,9 @@ import {
   JoinColumn,
   OneToOne,
 } from 'typeorm';
-import {
-  subcriptionCost,
-  subcriptions,
-  subcriptionStatus,
-} from '../helpers/config';
+import { subcriptionStatus } from '../helpers/config';
 import { ApiKeyEntity } from '../../api-key/entity/entity';
+import { SubcriptionsEntity } from '../../subcriptions/entity/entity';
 
 @Entity({ name: 'organization', schema: 'public' })
 export class OrganizationEntity {
@@ -57,13 +54,12 @@ export class OrganizationEntity {
   @JoinColumn({ name: 'api_key_id' })
   api_keys?: ApiKeyEntity;
 
-  @Column({
-    type: 'enum',
-    nullable: false,
-    default: subcriptions[0],
-    enum: subcriptions,
-  })
-  subcription!: string;
+  @Column({ type: 'uuid', nullable: false })
+  subcription_id?: string; // 👈 plain column
+
+  @OneToOne(() => SubcriptionsEntity, { nullable: false })
+  @JoinColumn({ name: 'subcription_id' })
+  subcription?: SubcriptionsEntity;
 
   @Column({
     type: 'enum',
@@ -73,15 +69,7 @@ export class OrganizationEntity {
   })
   subcription_status!: string;
 
-  @Column({
-    type: 'enum',
-    nullable: false,
-    default: subcriptionCost[0],
-    enum: subcriptionCost,
-  })
-  subcription_cost!: number;
-
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp' })
   subcription_expire!: Date;
 
   @CreateDateColumn({ type: 'timestamp' })
