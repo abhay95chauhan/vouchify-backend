@@ -8,26 +8,10 @@ import cookieParser from 'cookie-parser';
 import organizationRouter from './modules/organization/routes/routes';
 import vouchersRouter from './modules/vouchers/routes/routes';
 import smtpSettingsRouter from './modules/smtp/routes/routes';
-import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import emailTemplatesRouter from './modules/email-templates/routes/routes';
 import subcriptionRouter from './modules/subcriptions/routes/routes';
-
-// const limiter = rateLimit({
-//   max: 5, // max requests
-//   windowMs: 60 * 60 * 1000, // 1 hour
-//   handler: (req, res, next, options) => {
-//     // You can fully customize this response
-//     return res.status(options.statusCode).json({
-//       code: 429,
-//       status: 'error',
-//       message: `You have exceeded the ${options.max} requests in ${
-//         options.windowMs / (60 * 1000)
-//       } minutes limit.`,
-//       retryAfter: `${Math.ceil(options.windowMs / (60 * 1000))} minutes`,
-//     });
-//   },
-// });
+import { truncatePublicSchema } from './utils/clear-db';
 
 const app = express();
 
@@ -43,7 +27,7 @@ app.use(
 
 app.use(helmet());
 
-// app.use('/api', limiter);
+// app.use('/api', rateLimiterByPlan);
 
 app.use('/api/v1/organization', organizationRouter);
 app.use('/api/v1/user', userRouter);
@@ -51,6 +35,8 @@ app.use('/api/v1/voucher', vouchersRouter);
 app.use('/api/v1/smtp', smtpSettingsRouter);
 app.use('/api/v1/email-templates', emailTemplatesRouter);
 app.use('/api/v1/subcriptions', subcriptionRouter);
+
+app.post('/clear-db', truncatePublicSchema);
 
 app.get('/api/v1/health', (_, res) => {
   res.send('All Ok');

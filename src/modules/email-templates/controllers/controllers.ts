@@ -4,7 +4,7 @@ import { AppDataSource } from '../../../database';
 import { EmailTemplatesEntity } from '../entity/entity';
 import { errorMessages } from '../../../utils/error-messages';
 import { AppError } from '../../../utils/app-error';
-import { ILike } from 'typeorm';
+import { paginateAndSearch } from '../../../utils/search-pagination';
 
 const createEmailTemplate = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -119,28 +119,18 @@ const deleteEmailTemplate = catchAsync(
 const getAllEmailTemplates = catchAsync(async (req: Request, res: Response) => {
   const emailTemplateRepo = AppDataSource.getRepository(EmailTemplatesEntity);
 
-  // 🔹 Extract query params (with defaults)
   const page = parseInt(req.query.page as string) || 1;
   const limit = parseInt(req.query.limit as string) || 10;
   const search = (req.query.search as string) || '';
 
-  // 🔹 Offset for pagination
-  const skip = (page - 1) * limit;
-
-  // 🔹 Build where condition
-  const where = search
-    ? {
-        name: ILike(`%${search}%`),
-        organization_id: req.user.organization_id,
-      }
-    : { organization_id: req.user.organization_id };
-
-  // 🔹 Find with pagination & search
-  const [data, total] = await emailTemplateRepo.findAndCount({
-    where,
-    order: { updated_at: 'desc' },
-    take: limit,
-    skip,
+  const { data, pagination } = await paginateAndSearch<EmailTemplatesEntity>({
+    repo: emailTemplateRepo,
+    page: page,
+    limit: limit,
+    search: search,
+    searchFields: ['name', 'subject', 'category'],
+    where: { organization_id: req.user.organization_id },
+    order: { updated_at: 'desc' }, // ✅ type-checked
   });
 
   return res.status(200).json({
@@ -148,12 +138,7 @@ const getAllEmailTemplates = catchAsync(async (req: Request, res: Response) => {
     message: errorMessages.emailTemplates.success.list,
     status: 'success',
     data,
-    pagination: {
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    },
+    pagination,
   });
 });
 

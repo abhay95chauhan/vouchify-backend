@@ -2,11 +2,11 @@ import { NextFunction, Request, Response } from 'express';
 import { catchAsync } from '../../../utils/catch-async';
 import { AppDataSource } from '../../../database';
 import { VouchersEntity } from '../entity/entity';
-import { ILike } from 'typeorm';
 import { AppError } from '../../../utils/app-error';
 import { errorMessages } from '../../../utils/error-messages';
 import moment from 'moment-timezone';
-import { discountType, redeemPerUser } from '../helpers/config';
+import { discountType } from '../helpers/config';
+import { paginateAndSearch } from '../../../utils/search-pagination';
 
 const createOrganizationVoucher = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -77,7 +77,10 @@ const updateOrganizationVoucher = catchAsync(
       return;
     }
 
-    await voucherRepo.update({ code: req.params.code }, { ...req.body });
+    await voucherRepo.update(
+      { code: req.params.code },
+      { ...req.body, updated_at: new Date() }
+    );
 
     res.status(200).json({
       code: 200,
@@ -206,38 +209,24 @@ const getAllOrganizationVouchers = catchAsync(
   async (req: Request, res: Response) => {
     const vouchersRepo = AppDataSource.getRepository(VouchersEntity);
 
-    // 🔹 Extract query params (with defaults)
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     const search = (req.query.search as string) || '';
 
-    // 🔹 Offset for pagination
-    const skip = (page - 1) * limit;
-
-    // 🔹 Build where condition
-    const where = search
-      ? {
-          code: ILike(`%${search}%`),
-          organization_id: req.user.organization_id,
-        }
-      : { organization_id: req.user.organization_id };
-
-    // 🔹 Find with pagination & search
-    const [data, total] = await vouchersRepo.findAndCount({
-      where,
-      order: { code: 'ASC' },
-      take: limit,
-      skip,
+    const { data, pagination } = await paginateAndSearch<VouchersEntity>({
+      repo: vouchersRepo,
+      page: page,
+      limit: limit,
+      search: search,
+      searchFields: ['name', 'code', 'discount_type'],
+      where: { organization_id: req.user.organization_id },
+      // relations: ['organization'],
+      order: { updated_at: 'DESC' }, // ✅ type-checked
     });
 
     return res.status(200).json({
       data,
-      pagination: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
+      pagination,
     });
   }
 );
