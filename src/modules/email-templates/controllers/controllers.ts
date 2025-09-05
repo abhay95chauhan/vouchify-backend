@@ -130,7 +130,7 @@ const getAllEmailTemplates = catchAsync(async (req: Request, res: Response) => {
     search: search,
     searchFields: ['name', 'subject', 'category'],
     where: { organization_id: req.user.organization_id },
-    order: { updated_at: 'desc' }, // ✅ type-checked
+    order: { updated_at: 'DESC' }, // ✅ type-checked
   });
 
   return res.status(200).json({

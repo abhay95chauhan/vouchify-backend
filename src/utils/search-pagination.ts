@@ -11,9 +11,9 @@ interface QueryOptions<T extends ObjectLiteral> {
   page?: number;
   limit?: number;
   search?: string;
-  searchFields?: (keyof T | string)[]; // allow both
+  searchFields?: (keyof T | string)[];
   where?: FindOptionsWhere<T>;
-  order?: FindOptionsOrder<T>;
+  order?: Record<string, 'ASC' | 'DESC'>; // ✅ dot-notation allowed
   relations?: string[];
 }
 
@@ -30,13 +30,11 @@ export async function paginateAndSearch<T extends ObjectLiteral>({
   const skip = (page - 1) * limit;
 
   let searchWhere: FindOptionsWhere<T>[] = [];
-
   if (search && searchFields.length > 0) {
     searchWhere = searchFields.map((rawField) => {
-      const field = String(rawField); // ✅ always treat as string
+      const field = String(rawField);
 
       if (field.includes('.')) {
-        // nested relation like "organization.name"
         const [relation, nestedField] = field.split('.');
         return {
           ...where,
@@ -51,9 +49,28 @@ export async function paginateAndSearch<T extends ObjectLiteral>({
     });
   }
 
+  // 🔹 Transform dot-notation into nested order object
+  const buildOrder = (
+    order: Record<string, 'ASC' | 'DESC'>
+  ): FindOptionsOrder<T> => {
+    const result: any = {};
+    for (const [field, direction] of Object.entries(order)) {
+      if (field.includes('.')) {
+        const [relation, nestedField] = field.split('.');
+        result[relation] = {
+          ...(result[relation] || {}),
+          [nestedField]: direction,
+        };
+      } else {
+        result[field] = direction;
+      }
+    }
+    return result;
+  };
+
   const [data, total] = await repo.findAndCount({
     where: searchWhere.length > 0 ? searchWhere : where,
-    order,
+    order: buildOrder(order),
     take: limit,
     skip,
     relations,

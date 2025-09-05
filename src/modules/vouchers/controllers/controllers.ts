@@ -212,16 +212,18 @@ const getAllOrganizationVouchers = catchAsync(
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     const search = (req.query.search as string) || '';
+    const orderBy = (req.query.orderBy as string) || 'ASC';
+    const orderByField = (req.query.orderByField as string) || 'name';
 
     const { data, pagination } = await paginateAndSearch<VouchersEntity>({
       repo: vouchersRepo,
       page: page,
       limit: limit,
       search: search,
-      searchFields: ['name', 'code', 'discount_type'],
+      searchFields: ['name', 'code', 'prefix', 'postfix'],
       where: { organization_id: req.user.organization_id },
       // relations: ['organization'],
-      order: { updated_at: 'DESC' }, // ✅ type-checked
+      order: { [orderByField]: orderBy as 'ASC' | 'DESC' }, // ✅ type-checked
     });
 
     return res.status(200).json({
