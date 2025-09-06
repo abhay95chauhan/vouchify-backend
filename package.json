@@ -4,7 +4,6 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon --watch src --exec ts-node src/index.ts",
-    "dev:local": "cross-env NODE_ENV=local nodemon --watch src --exec ts-node src/index.ts",
     "start": "cross-env NODE_ENV=production node dist/index.js",
     "build": "cross-env NODE_ENV=production tsc",
     "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate src/migrations/InitialMigration -d src/database/database.ts",
