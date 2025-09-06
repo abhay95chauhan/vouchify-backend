@@ -32,6 +32,9 @@ export class SubcriptionsEntity {
   })
   price!: { monthly: number; yearly: number };
 
+  @Column({ type: 'int', default: 0 })
+  discount_in_percentage!: number;
+
   @Column({ type: 'varchar', length: 255, nullable: true })
   description!: string;
 
