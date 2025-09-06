@@ -152,7 +152,10 @@ const protect = catchAsync(
     }
 
     const userRepo = AppDataSource.getRepository(UserEntity);
-    const currentUser = await userRepo.findOne({ where: { id: userId } });
+    const currentUser = await userRepo.findOne({
+      where: { id: userId },
+      relations: ['organization', 'organization.subcription'],
+    });
 
     if (!currentUser) {
       return next(

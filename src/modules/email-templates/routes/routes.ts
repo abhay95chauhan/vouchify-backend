@@ -5,7 +5,7 @@ import { emailTemplateController } from '../controllers/controllers';
 const emailTemplatesRouter = express.Router();
 
 emailTemplatesRouter.use(userController.protect);
-
+// emailTemplatesRouter.use(rateLimiterByPlan);
 emailTemplatesRouter.get('/list', emailTemplateController.getAllEmailTemplates);
 emailTemplatesRouter.post('/', emailTemplateController.createEmailTemplate);
 emailTemplatesRouter.get('/:id', emailTemplateController.getEmailTemplateById);

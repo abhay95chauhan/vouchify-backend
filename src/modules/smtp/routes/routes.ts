@@ -4,6 +4,7 @@ import { smtpController } from '../controllers/controllers';
 
 const smtpSettingsRouter = express.Router();
 
+// smtpSettingsRouter.use(rateLimiterByPlan);
 smtpSettingsRouter.use(userController.protect);
 
 smtpSettingsRouter.post('/', smtpController.smtpConfigure);

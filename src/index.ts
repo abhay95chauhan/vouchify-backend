@@ -27,8 +27,6 @@ app.use(
 
 app.use(helmet());
 
-// app.use('/api', rateLimiterByPlan);
-
 app.use('/api/v1/organization', organizationRouter);
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/voucher', vouchersRouter);
