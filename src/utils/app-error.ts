@@ -51,6 +51,7 @@ export const globalErrorHandler: ErrorRequestHandler = (
     status,
     message,
     detail,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+    ...((process.env.NODE_ENV === 'development' ||
+      process.env.NODE_ENV === 'local') && { stack: err.stack }),
   });
 };

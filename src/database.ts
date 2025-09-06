@@ -32,6 +32,7 @@ export const AppDataSource = new DataSource({
 
 AppDataSource.initialize()
   .then(() => {
+    console.log('NODE_ENV', process.env.NODE_ENV);
     console.log('Data Source has been initialized!');
   })
   .catch((err) => {

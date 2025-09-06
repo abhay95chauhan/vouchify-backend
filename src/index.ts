@@ -1,5 +1,8 @@
 import dotenv from 'dotenv';
-dotenv.config();
+import path from 'path';
+const nodeEnv = process.env.NODE_ENV || 'local';
+const envFile = `.env.${nodeEnv}`;
+dotenv.config({ path: path.resolve(process.cwd(), envFile) });
 import express from 'express';
 import cors from 'cors';
 import { AppError, globalErrorHandler } from './utils/app-error';

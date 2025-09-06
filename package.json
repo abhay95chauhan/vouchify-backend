@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "nodemon --watch src --exec ts-node src/index.ts",
-    "start": "node dist/index.js",
-    "build": "tsc",
+    "dev": "cross-env NODE_ENV=development nodemon --watch src --exec ts-node src/index.ts",
+    "dev:local": "cross-env NODE_ENV=local nodemon --watch src --exec ts-node src/index.ts",
+    "start": "cross-env NODE_ENV=production node dist/index.js",
+    "build": "cross-env NODE_ENV=production tsc",
     "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate src/migrations/InitialMigration -d src/database/database.ts",
     "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run -d src/database/database.ts",
     "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d src/database/database.ts"
