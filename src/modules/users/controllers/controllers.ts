@@ -47,6 +47,15 @@ const loginUser = catchAsync(
       return;
     }
 
+    await user.update(
+      {
+        email: req.body.email,
+      },
+      {
+        last_login_at: new Date(),
+      }
+    );
+
     const payload = {
       id: isExist.id,
       email: isExist.email,

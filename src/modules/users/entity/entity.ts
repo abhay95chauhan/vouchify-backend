@@ -43,8 +43,14 @@ export class UserEntity {
   @Column({ type: 'boolean', default: true, nullable: false })
   is_active!: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  is_invited?: boolean;
+
   @Column({ type: 'boolean', default: false, nullable: false })
   is_email_varified!: boolean;
+
+  @Column({ type: 'boolean', default: false, nullable: false })
+  is_phone_verified!: boolean;
 
   @Column({ type: 'uuid', nullable: true })
   organization_id?: string; // 👈 plain column
@@ -55,6 +61,9 @@ export class UserEntity {
 
   @CreateDateColumn({ type: 'timestamp' })
   joined_at!: Date;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  last_login_at?: Date;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at?: Date;
