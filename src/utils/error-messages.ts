@@ -61,6 +61,8 @@ export const errorMessages = {
     },
     error: {
       notFound: 'Template Not Found',
+      alreadyExist:
+        'Template With This Name Already Exist in Your Organization',
     },
   },
   subcription: {

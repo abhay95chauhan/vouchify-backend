@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import Mustache from 'mustache';
 
 export interface ISmtpPost {
   enabled?: boolean;
@@ -37,11 +38,13 @@ export const orgSMTPTransporter = async (
     },
   });
 
+  const html = Mustache.render(emailData.html, { name: 'naya' });
+
   const info = await transporter.sendMail({
     from: `"${smtpData?.sender_name}" <${smtpData?.sender_email}>`,
     to: 'someone@example.com',
     subject: emailData.subject,
-    html: emailData.html,
+    html,
   });
 
   return nodemailer.getTestMessageUrl(info);

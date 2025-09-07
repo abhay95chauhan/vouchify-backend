@@ -10,6 +10,16 @@ const createEmailTemplate = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const emailTemplateRepo = AppDataSource.getRepository(EmailTemplatesEntity);
 
+    const existTemplateData = await emailTemplateRepo.findOneBy({
+      name: req.body.name,
+      organization_id: req.user.organization_id,
+    });
+
+    if (existTemplateData) {
+      next(new AppError(errorMessages.emailTemplates.error.alreadyExist, 400));
+      return;
+    }
+
     const newTemplate = emailTemplateRepo.create({
       ...req.body,
       organization_id: req.user.organization_id,
