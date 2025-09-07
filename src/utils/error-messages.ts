@@ -47,6 +47,7 @@ export const errorMessages = {
     },
     error: {
       alreadyConfigure: 'SMTP Already Configured',
+      notConfigure: 'SMTP Not Configured',
       notFound: 'SMTP Configuration Not Found',
     },
   },
