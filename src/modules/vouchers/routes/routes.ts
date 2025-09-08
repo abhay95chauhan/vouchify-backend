@@ -13,4 +13,7 @@ vouchersRouter.get('/:code', vouchersController.getVoucherByCode);
 vouchersRouter.patch('/:code', vouchersController.updateOrganizationVoucher);
 vouchersRouter.delete('/:code', vouchersController.deleteOrganizationVoucher);
 
+// smtp mail
+vouchersRouter.post('/send-mail', vouchersController.sendVoucherInMail);
+
 export default vouchersRouter;

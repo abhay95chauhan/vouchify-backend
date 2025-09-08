@@ -22,28 +22,36 @@ export interface IEmailTemplate {
   html: string; // full HTML template
 }
 
-export const orgSMTPTransporter = async (
-  smtpData: ISmtpPost,
-  emailData: IEmailTemplate
+interface ITransporterData<T> {
+  smtpData: ISmtpPost;
+  emailData: IEmailTemplate;
+  entityData?: T;
+  sendTo: string;
+}
+export const orgSMTPTransporter = async <T>(
+  transporterData: ITransporterData<T>
 ) => {
   let testAccount = await nodemailer.createTestAccount();
 
   const transporter = nodemailer.createTransport({
-    host: smtpData.host,
-    port: smtpData.port,
-    secure: smtpData.secure,
+    host: transporterData.smtpData.host,
+    port: transporterData.smtpData.port,
+    secure: transporterData.smtpData.secure,
     auth: {
       user: testAccount.user, // generated ethereal user
       pass: testAccount.pass, // generated ethereal password
     },
   });
 
-  const html = Mustache.render(emailData.html, { name: 'naya' });
+  const html = Mustache.render(
+    transporterData.emailData.html,
+    transporterData.entityData
+  );
 
   const info = await transporter.sendMail({
-    from: `"${smtpData?.sender_name}" <${smtpData?.sender_email}>`,
-    to: 'someone@example.com',
-    subject: emailData.subject,
+    from: `"${transporterData.smtpData?.sender_name}" <${transporterData.smtpData?.sender_email}>`,
+    to: transporterData.sendTo,
+    subject: transporterData.emailData.subject,
     html,
   });
 

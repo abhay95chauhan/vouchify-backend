@@ -7,6 +7,8 @@ import { errorMessages } from '../../../utils/error-messages';
 import moment from 'moment-timezone';
 import { discountType } from '../helpers/config';
 import { paginateAndSearch } from '../../../utils/search-pagination';
+import { sendOrgTemplateMailService } from '../../smtp/helpers/send-mail';
+import { predefinedEmailTemplates } from '../../email-templates/helpers/config';
 
 const createOrganizationVoucher = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -233,6 +235,47 @@ const getAllOrganizationVouchers = catchAsync(
   }
 );
 
+const sendVoucherInMail = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { code, email } = req.body;
+
+    if (!email) {
+      next(new AppError(errorMessages.invalidEmail, 400));
+      return;
+    }
+
+    if (!code) {
+      next(new AppError(errorMessages.voucher.error.invalidCode, 404));
+      return;
+    }
+
+    const voucherRepo = AppDataSource.getRepository(VouchersEntity);
+    const voucherData = await voucherRepo.findOneBy({
+      code: code,
+      organization_id: req.user.organization_id,
+    });
+
+    if (!voucherData) {
+      next(new AppError(errorMessages.voucher.error.invalidCode, 404));
+      return;
+    }
+
+    const mailres = await sendOrgTemplateMailService<VouchersEntity>({
+      entityData: voucherData,
+      organization_id: req.user.organization_id,
+      templateName: predefinedEmailTemplates.VOUCHER,
+      sendTo: email,
+    });
+
+    return res.status(200).json({
+      code: 200,
+      message: errorMessages.smtp.success.mailSend,
+      status: 'success',
+      data: mailres,
+    });
+  }
+);
+
 export const vouchersController = {
   getAllOrganizationVouchers,
   createOrganizationVoucher,
@@ -240,4 +283,5 @@ export const vouchersController = {
   updateOrganizationVoucher,
   deleteOrganizationVoucher,
   validateVoucherByCode,
+  sendVoucherInMail,
 };

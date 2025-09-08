@@ -44,6 +44,7 @@ export const errorMessages = {
       configure: 'SMTP Configured',
       updateConfiguration: 'SMTP Configuration Updated',
       found: 'SMTP Configuration Found',
+      mailSend: 'Mail Sent Successfully',
     },
     error: {
       alreadyConfigure: 'SMTP Already Configured',
@@ -77,4 +78,5 @@ export const errorMessages = {
     },
   },
   somethingWrong: 'Something went wrong',
+  invalidEmail: 'Invalid Email',
 };

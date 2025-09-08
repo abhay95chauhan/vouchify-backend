@@ -4,6 +4,7 @@ import { catchAsync } from '../../../utils/catch-async';
 import { errorMessages } from '../../../utils/error-messages';
 import { AppError } from '../../../utils/app-error';
 import { SmtpSettingsEntity } from '../entity/entity';
+import { sendOrgTemplateMailService } from '../helpers/send-mail';
 
 const smtpConfigure = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -55,7 +56,27 @@ const getOrgnizationSmtpConfiguration = catchAsync(
   }
 );
 
+const sendTestMail = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { templateId, email } = req.body;
+
+    const mailres = await sendOrgTemplateMailService({
+      organization_id: req.user.organization_id,
+      templateId: templateId,
+      sendTo: email,
+    });
+
+    return res.status(200).json({
+      code: 200,
+      message: errorMessages.smtp.success.mailSend,
+      status: 'success',
+      data: mailres,
+    });
+  }
+);
+
 export const smtpController = {
   smtpConfigure,
   getOrgnizationSmtpConfiguration,
+  sendTestMail,
 };
