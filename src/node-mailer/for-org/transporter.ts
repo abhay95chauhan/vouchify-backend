@@ -45,7 +45,7 @@ export const orgSMTPTransporter = async <T>(
 
   const html = Mustache.render(
     transporterData.emailData.html,
-    transporterData.entityData
+    transporterData?.entityData ?? {}
   );
 
   const info = await transporter.sendMail({
