@@ -26,7 +26,7 @@ interface ITransporterData<T> {
   smtpData: ISmtpPost;
   emailData: IEmailTemplate;
   entityData?: T;
-  sendTo: string;
+  sendTo: string | string[];
 }
 export const orgSMTPTransporter = async <T>(
   transporterData: ITransporterData<T>

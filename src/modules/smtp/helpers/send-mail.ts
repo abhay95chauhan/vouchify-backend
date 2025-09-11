@@ -10,8 +10,9 @@ interface IEmailService<T> {
   templateName?: string;
   templateId?: string;
   entityData?: T;
-  sendTo: string;
+  sendTo: string | string[];
 }
+
 export async function sendOrgTemplateMailService<T>(
   emailServiceData: IEmailService<T>
 ) {
