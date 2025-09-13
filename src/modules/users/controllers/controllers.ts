@@ -7,6 +7,8 @@ import bcrypt from 'bcryptjs';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { errorMessages } from '../../../utils/error-messages';
 import { ApiKeyEntity } from '../../api-key/entity/entity';
+import { userSessionController } from '../../user-sessions/controllers/controllers';
+import { UserSessionsEntity } from '../../user-sessions/entity/entity';
 
 // Extend Express Request interface to include 'user'
 declare global {
@@ -72,6 +74,15 @@ const loginUser = catchAsync(
       secure: NODE_ENV === 'production',
     });
 
+    if (isExist.organization_id) {
+      await userSessionController.createSession({
+        user_id: isExist.id,
+        token,
+        user_agent: req.headers['user-agent'],
+        ip_address: req.ip,
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      });
+    }
     return res.status(200).json({
       code: 200,
       message: errorMessages.auth.success.login,
@@ -107,7 +118,12 @@ const createUser = catchAsync(
   }
 );
 
-const logout = async (_: Request, res: Response, next: NextFunction) => {
+const logout = async (req: Request, res: Response, next: NextFunction) => {
+  const token = req.cookies.jwt;
+  const userSessionRepo = AppDataSource.getRepository(UserSessionsEntity);
+
+  await userSessionRepo.delete({ token });
+
   res.cookie('jwt', '', {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
@@ -153,6 +169,21 @@ const protect = catchAsync(
       userId = savedApiKey.user_id;
     } else if (token) {
       const decoded: any = jwt.verify(token, JWT_SECRET);
+
+      const userSessionRepo = AppDataSource.getRepository(UserSessionsEntity);
+      const session = await userSessionRepo.findOneBy({
+        token,
+        revoked: false,
+      });
+      if (!session) {
+        return next(
+          new AppError(
+            'You are not logged in! Please log in to get access.',
+            401
+          )
+        );
+      }
+
       userId = decoded?.id;
     }
 

@@ -15,6 +15,7 @@ import helmet from 'helmet';
 import emailTemplatesRouter from './modules/email-templates/routes/routes';
 import subcriptionRouter from './modules/subcriptions/routes/routes';
 import { truncatePublicSchema } from './utils/clear-db';
+import userSessionRouter from './modules/user-sessions/routes/routes';
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use('/api/v1/voucher', vouchersRouter);
 app.use('/api/v1/smtp', smtpSettingsRouter);
 app.use('/api/v1/email-templates', emailTemplatesRouter);
 app.use('/api/v1/subcriptions', subcriptionRouter);
+app.use('/api/v1/user-sessions', userSessionRouter);
 
 app.post('/clear-db', truncatePublicSchema);
 

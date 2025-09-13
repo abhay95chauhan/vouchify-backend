@@ -66,6 +66,16 @@ export const errorMessages = {
         'Template With This Name Already Exist in Your Organization',
     },
   },
+  userSessions: {
+    success: {
+      delete: 'Session Deleted Successfully',
+      update: 'Session Revoked Successfully',
+      list: 'Sessions Fetched',
+    },
+    error: {
+      notFound: 'Session Not Found',
+    },
+  },
   subcription: {
     success: {
       create: 'Subcription Created Successfully',
