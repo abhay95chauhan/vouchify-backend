@@ -44,6 +44,24 @@ const getAllUserSession = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getUserSessionByToken = catchAsync(
+  async (req: Request, res: Response) => {
+    const userSessionRepo = AppDataSource.getRepository(UserSessionsEntity);
+
+    const userSessionsRes = await userSessionRepo.findOneBy({
+      token: req.params.token,
+      revoked: false,
+    });
+
+    return res.status(200).json({
+      code: 200,
+      message: errorMessages.userSessions.success.list,
+      status: 'success',
+      data: userSessionsRes,
+    });
+  }
+);
+
 const updateUserSession = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const userSessionRepo = AppDataSource.getRepository(UserSessionsEntity);
@@ -109,9 +127,28 @@ const deleteUserSession = catchAsync(
   }
 );
 
+const deleteAllUserSession = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userSessionRepo = AppDataSource.getRepository(UserSessionsEntity);
+
+    const userSessionsRes = await userSessionRepo.delete({
+      user_id: req.user.id,
+    });
+
+    return res.status(200).json({
+      code: 200,
+      message: errorMessages.userSessions.success.allDelete,
+      status: 'success',
+      data: userSessionsRes,
+    });
+  }
+);
+
 export const userSessionController = {
   createSession,
   getAllUserSession,
   updateUserSession,
   deleteUserSession,
+  getUserSessionByToken,
+  deleteAllUserSession,
 };

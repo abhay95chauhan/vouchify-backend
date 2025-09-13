@@ -69,6 +69,7 @@ export const errorMessages = {
   userSessions: {
     success: {
       delete: 'Session Deleted Successfully',
+      allDelete: 'All Session has been Revoked Successfully',
       update: 'Session Revoked Successfully',
       list: 'Sessions Fetched',
     },
