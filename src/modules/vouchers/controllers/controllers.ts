@@ -193,6 +193,15 @@ const validateVoucherByCode = catchAsync(
       discount = voucherData.discount_value;
     }
 
+    if (discount > orderAmount) {
+      return next(
+        new AppError(
+          `Discount (${currencySymbol} ${discount}) cannot exceed order amount (${currencySymbol} ${orderAmount})`,
+          400
+        )
+      );
+    }
+
     return res.status(200).json({
       code: 200,
       message: errorMessages.voucher.success.found,
