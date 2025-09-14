@@ -76,6 +76,12 @@ export class VouchersEntity {
   @Column({ type: 'int', nullable: true, default: null })
   max_discount_amount?: number | null;
 
+  @Column({ type: 'text', nullable: true, array: true })
+  eligible_products!: string[];
+
+  @Column({ type: 'timestamptz', nullable: true })
+  last_redeemed_at?: Date;
+
   @CreateDateColumn({ type: 'timestamptz' })
   created_at!: Date;
 

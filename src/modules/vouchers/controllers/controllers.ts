@@ -125,7 +125,7 @@ const deleteOrganizationVoucher = catchAsync(
 
 const validateVoucherByCode = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { code, orderAmount, currencySymbol } = req.body;
+    const { code, orderAmount, currencySymbol, productIds = [] } = req.body;
 
     if (!code) {
       next(new AppError(errorMessages.voucher.error.invalidCode, 404));
@@ -178,6 +178,21 @@ const validateVoucherByCode = catchAsync(
     // if (voucherData.redeem_limit_per_user === redeemPerUser[0]) {
 
     // }
+
+    // ✅ Check product eligibility
+    if (voucherData.eligible_products?.length) {
+      const isEligible = productIds?.some((p: string) =>
+        voucherData.eligible_products!.includes(p)
+      );
+      if (!isEligible) {
+        return next(
+          new AppError(
+            'This voucher is not valid for the selected products',
+            400
+          )
+        );
+      }
+    }
 
     // ✅ Calculate discount
     let discount = 0;
