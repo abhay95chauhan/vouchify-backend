@@ -23,6 +23,11 @@ export const errorMessages = {
     },
   },
   voucher: {
+    redeemption: {
+      success: {
+        redeem: 'Voucher Redeemed Successfully',
+      },
+    },
     success: {
       found: 'Voucher Found',
       create: 'Voucher Created Successfully',
@@ -31,6 +36,8 @@ export const errorMessages = {
     },
     error: {
       notFound: 'Voucher Not Found',
+      alreadyRedeem: 'This User has Already Used This Voucher.',
+      notValidOnProducts: 'This Voucher is Not Valid for the Selected Products',
       invalidCode: 'Invalid Code',
       voucherExist:
         'Voucher Already Exist with this Code, Please Change Code, Prefix or Postfix ',

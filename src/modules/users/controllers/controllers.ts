@@ -151,7 +151,7 @@ const protect = catchAsync(
       });
 
       if (!savedApiKey) {
-        return next(new AppError('Invalid API Key and API Secret!', 401));
+        return next(new AppError('Invalid API Key and API Secret!', 403));
       }
     } else if (req.cookies.jwt) {
       token = req.cookies.jwt;

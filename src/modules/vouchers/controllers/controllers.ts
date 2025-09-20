@@ -9,6 +9,7 @@ import { discountType } from '../helpers/config';
 import { paginateAndSearch } from '../../../utils/search-pagination';
 import { sendOrgTemplateMailService } from '../../smtp/helpers/send-mail';
 import { predefinedEmailTemplates } from '../../email-templates/helpers/config';
+import { validateVoucher } from './validate-voucher';
 
 const createOrganizationVoucher = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -125,109 +126,26 @@ const deleteOrganizationVoucher = catchAsync(
 
 const validateVoucherByCode = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { code, orderAmount, currencySymbol, productIds = [] } = req.body;
+    const { code, orderAmount, productIds = [], email } = req.body;
 
-    if (!code) {
-      next(new AppError(errorMessages.voucher.error.invalidCode, 404));
-      return;
-    }
-
-    const voucherRepo = AppDataSource.getRepository(VouchersEntity);
-    const voucherData = await voucherRepo.findOneBy({
-      code: code,
-      organization_id: req.user.organization_id,
-    });
-
-    if (!voucherData) {
-      next(new AppError(errorMessages.voucher.error.invalidCode, 404));
-      return;
-    }
-
-    const now = moment.tz(req.user?.organization?.timezone)?.startOf('day'); // current time
-    const start = moment(voucherData.start_date)?.startOf('day');
-    const end = moment(voucherData.end_date)?.endOf('day'); // 👈 extend to end of day
-
-    if (now?.isBefore(start)) {
-      next(new AppError(errorMessages.voucher.error.voucherNotActive, 400));
-      return;
-    }
-
-    if (now?.isAfter(end)) {
-      next(new AppError(errorMessages.voucher.error.voucherExpired, 400));
-      return;
-    }
-
-    if (
-      voucherData.max_redemptions &&
-      voucherData.redemption_count >= voucherData.max_redemptions
-    ) {
-      next(new AppError(errorMessages.voucher.error.voucherLimitExceeded, 400));
-      return;
-    }
-
-    if (orderAmount < voucherData.min_order_amount) {
-      next(
-        new AppError(
-          `Amount must be at least ${currencySymbol} ${voucherData.min_order_amount} to use this voucher`,
-          400
-        )
-      );
-      return;
-    }
-
-    // if (voucherData.redeem_limit_per_user === redeemPerUser[0]) {
-
-    // }
-
-    // ✅ Check product eligibility
-    if (voucherData.eligible_products?.length) {
-      const isEligible = productIds?.some((p: string) =>
-        voucherData.eligible_products!.includes(p)
-      );
-      if (!isEligible) {
-        return next(
-          new AppError(
-            'This voucher is not valid for the selected products',
-            400
-          )
-        );
-      }
-    }
-
-    // ✅ Calculate discount
-    let discount = 0;
-    if (voucherData.discount_type === discountType[1]) {
-      discount = (orderAmount * voucherData.discount_value) / 100;
-      if (
-        voucherData.max_discount_amount &&
-        discount > voucherData.max_discount_amount
-      ) {
-        discount = voucherData.max_discount_amount;
-      }
-    } else {
-      discount = voucherData.discount_value;
-    }
-
-    if (discount > orderAmount) {
-      return next(
-        new AppError(
-          `Discount (${currencySymbol} ${discount}) cannot exceed order amount (${currencySymbol} ${orderAmount})`,
-          400
-        )
-      );
-    }
-
-    return res.status(200).json({
-      code: 200,
-      message: errorMessages.voucher.success.found,
-      status: 'success',
-      data: {
-        discount,
-        finalAmount: orderAmount - discount,
+    try {
+      const result = await validateVoucher({
+        code,
         orderAmount,
-        voucherData,
-      },
-    });
+        productIds,
+        user: req.user,
+        email,
+      });
+
+      return res.status(200).json({
+        code: 200,
+        message: errorMessages.voucher.success.found,
+        status: 'success',
+        data: result,
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 );
 
