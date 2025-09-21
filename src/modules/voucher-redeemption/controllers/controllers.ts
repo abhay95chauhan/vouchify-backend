@@ -87,6 +87,7 @@ const getAllRedeemedVouchers = catchAsync(
           'user_name',
           'user_email',
         ],
+        relations: ['voucher'],
         where: {
           organization_id: req.user.organization_id,
           voucher_id: voucherId,
