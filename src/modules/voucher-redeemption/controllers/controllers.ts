@@ -6,6 +6,7 @@ import { errorMessages } from '../../../utils/error-messages';
 import { AppError } from '../../../utils/app-error';
 import { VouchersEntity } from '../../vouchers/entity/entity';
 import { validateVoucher } from '../../vouchers/controllers/validate-voucher';
+import { paginateAndSearch } from '../../../utils/search-pagination';
 
 const createVoucherRedeemption = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -61,6 +62,50 @@ const createVoucherRedeemption = catchAsync(
   }
 );
 
+const getAllRedeemedVouchers = catchAsync(
+  async (req: Request, res: Response) => {
+    const voucherId = req.params?.voucherId;
+    const voucherRedeemRepo = AppDataSource.getRepository(
+      VoucherRedemptionsEntity
+    );
+
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = (req.query.search as string) || '';
+    const orderBy = (req.query.orderBy as string) || 'DESC';
+    const orderByField = (req.query.orderByField as string) || 'created_at';
+
+    const { data, pagination } =
+      await paginateAndSearch<VoucherRedemptionsEntity>({
+        repo: voucherRedeemRepo,
+        page: page,
+        limit: limit,
+        search: search,
+        searchFields: [
+          'voucher.name',
+          'voucher.code',
+          'user_name',
+          'user_email',
+        ],
+        where: {
+          organization_id: req.user.organization_id,
+          voucher_id: voucherId,
+        },
+        // relations: ['organization'],
+        order: { [orderByField]: orderBy as 'ASC' | 'DESC' }, // ✅ type-checked
+      });
+
+    return res.status(200).json({
+      code: 200,
+      message: errorMessages.voucher.redeemption.success.list,
+      status: 'success',
+      data,
+      pagination,
+    });
+  }
+);
+
 export const redeemController = {
   createVoucherRedeemption,
+  getAllRedeemedVouchers,
 };

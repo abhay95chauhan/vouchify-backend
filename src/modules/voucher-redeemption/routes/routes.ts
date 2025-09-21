@@ -10,5 +10,7 @@ redeemVoucherRouter.post(
   '/:voucherCode',
   redeemController.createVoucherRedeemption
 );
+redeemVoucherRouter.get('/list', redeemController.getAllRedeemedVouchers);
+redeemVoucherRouter.get('/:voucherId', redeemController.getAllRedeemedVouchers);
 
 export default redeemVoucherRouter;

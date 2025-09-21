@@ -171,6 +171,9 @@ const getAllOrganizationVouchers = catchAsync(
     });
 
     return res.status(200).json({
+      code: 200,
+      message: errorMessages.voucher.success.list,
+      status: 'success',
       data,
       pagination,
     });

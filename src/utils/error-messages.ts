@@ -26,6 +26,7 @@ export const errorMessages = {
     redeemption: {
       success: {
         redeem: 'Voucher Redeemed Successfully',
+        list: 'Redeemed Vouchers Fetched',
       },
     },
     success: {
@@ -33,6 +34,7 @@ export const errorMessages = {
       create: 'Voucher Created Successfully',
       update: 'Voucher Updated Successfully',
       delete: 'Voucher Deleted Successfully',
+      list: 'Vouchers Fetched',
     },
     error: {
       notFound: 'Voucher Not Found',
