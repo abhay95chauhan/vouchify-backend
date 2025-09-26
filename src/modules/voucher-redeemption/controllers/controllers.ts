@@ -7,6 +7,7 @@ import { AppError } from '../../../utils/app-error';
 import { VouchersEntity } from '../../vouchers/entity/entity';
 import { validateVoucher } from '../../vouchers/controllers/validate-voucher';
 import { paginateAndSearch } from '../../../utils/search-pagination';
+import { FindOptionsWhere } from 'typeorm';
 
 const createVoucherRedeemption = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -74,6 +75,8 @@ const getAllRedeemedVouchers = catchAsync(
     const search = (req.query.search as string) || '';
     const orderBy = (req.query.orderBy as string) || 'DESC';
     const orderByField = (req.query.orderByField as string) || 'created_at';
+    const filters =
+      (req.query.filters as FindOptionsWhere<VoucherRedemptionsEntity>) || {};
 
     const { data, pagination } =
       await paginateAndSearch<VoucherRedemptionsEntity>({
@@ -94,6 +97,7 @@ const getAllRedeemedVouchers = catchAsync(
         },
         // relations: ['organization'],
         order: { [orderByField]: orderBy as 'ASC' | 'DESC' }, // ✅ type-checked
+        filters,
       });
 
     return res.status(200).json({

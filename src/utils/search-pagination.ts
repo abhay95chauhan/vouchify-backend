@@ -15,6 +15,7 @@ interface QueryOptions<T extends ObjectLiteral> {
   where?: FindOptionsWhere<T>;
   order?: Record<string, 'ASC' | 'DESC'>; // ✅ dot-notation allowed
   relations?: string[];
+  filters?: Record<string, any>; // 👈 new dynamic filters
 }
 
 export async function paginateAndSearch<T extends ObjectLiteral>({
@@ -26,10 +27,19 @@ export async function paginateAndSearch<T extends ObjectLiteral>({
   where = {},
   order = {},
   relations = [],
+  filters,
 }: QueryOptions<T>) {
   const skip = (page - 1) * limit;
 
   let searchWhere: FindOptionsWhere<T>[] = [];
+
+  let finalWhere: FindOptionsWhere<T> = where;
+
+  // 🔹 Add dynamic filters
+  if (filters && Object.keys(filters).length > 0) {
+    finalWhere = { ...finalWhere, ...filters };
+  }
+
   if (search && searchFields.length > 0) {
     searchWhere = searchFields.map((rawField) => {
       const field = String(rawField);
@@ -38,12 +48,14 @@ export async function paginateAndSearch<T extends ObjectLiteral>({
         const [relation, nestedField] = field.split('.');
         return {
           ...where,
+          ...finalWhere,
           [relation]: { [nestedField]: ILike(`%${search}%`) },
         } as FindOptionsWhere<T>;
       }
 
       return {
         ...where,
+        ...finalWhere,
         [field]: ILike(`%${search}%`),
       } as FindOptionsWhere<T>;
     });
@@ -69,7 +81,7 @@ export async function paginateAndSearch<T extends ObjectLiteral>({
   };
 
   const [data, total] = await repo.findAndCount({
-    where: searchWhere.length > 0 ? searchWhere : where,
+    where: searchWhere.length > 0 ? searchWhere : finalWhere,
     order: buildOrder(order),
     take: limit,
     skip,
