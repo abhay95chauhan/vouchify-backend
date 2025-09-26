@@ -74,15 +74,14 @@ const loginUser = catchAsync(
       secure: NODE_ENV === 'production',
     });
 
-    if (isExist.organization_id) {
-      await userSessionController.createSession({
-        user_id: isExist.id,
-        token,
-        user_agent: req.headers['user-agent'],
-        ip_address: req.ip,
-        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      });
-    }
+    await userSessionController.createSession({
+      user_id: isExist.id,
+      token,
+      user_agent: req.headers['user-agent'],
+      ip_address: req.ip,
+      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+
     return res.status(200).json({
       code: 200,
       message: errorMessages.auth.success.login,
