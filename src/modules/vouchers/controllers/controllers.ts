@@ -4,12 +4,11 @@ import { AppDataSource } from '../../../database';
 import { VouchersEntity } from '../entity/entity';
 import { AppError } from '../../../utils/app-error';
 import { errorMessages } from '../../../utils/error-messages';
-import moment from 'moment-timezone';
-import { discountType } from '../helpers/config';
 import { paginateAndSearch } from '../../../utils/search-pagination';
 import { sendOrgTemplateMailService } from '../../smtp/helpers/send-mail';
 import { predefinedEmailTemplates } from '../../email-templates/helpers/config';
 import { validateVoucher } from './validate-voucher';
+import { FindOptionsWhere } from 'typeorm';
 
 const createOrganizationVoucher = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -158,6 +157,8 @@ const getAllOrganizationVouchers = catchAsync(
     const search = (req.query.search as string) || '';
     const orderBy = (req.query.orderBy as string) || 'ASC';
     const orderByField = (req.query.orderByField as string) || 'name';
+    const filters =
+      (req.body.filters as FindOptionsWhere<VouchersEntity>) || {};
 
     const { data, pagination } = await paginateAndSearch<VouchersEntity>({
       repo: vouchersRepo,
@@ -166,8 +167,8 @@ const getAllOrganizationVouchers = catchAsync(
       search: search,
       searchFields: ['name', 'code', 'prefix', 'postfix'],
       where: { organization_id: req.user.organization_id },
-      // relations: ['organization'],
       order: { [orderByField]: orderBy as 'ASC' | 'DESC' }, // ✅ type-checked
+      filters,
     });
 
     return res.status(200).json({

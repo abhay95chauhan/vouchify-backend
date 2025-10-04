@@ -76,7 +76,7 @@ const getAllRedeemedVouchers = catchAsync(
     const orderBy = (req.query.orderBy as string) || 'DESC';
     const orderByField = (req.query.orderByField as string) || 'created_at';
     const filters =
-      (req.query.filters as FindOptionsWhere<VoucherRedemptionsEntity>) || {};
+      (req.body.filters as FindOptionsWhere<VoucherRedemptionsEntity>) || {};
 
     const { data, pagination } =
       await paginateAndSearch<VoucherRedemptionsEntity>({

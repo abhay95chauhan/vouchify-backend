@@ -6,7 +6,7 @@ const vouchersRouter = express.Router();
 
 vouchersRouter.use(userController.protect);
 
-vouchersRouter.get('/list', vouchersController.getAllOrganizationVouchers);
+vouchersRouter.post('/list', vouchersController.getAllOrganizationVouchers);
 vouchersRouter.post('/', vouchersController.createOrganizationVoucher);
 vouchersRouter.post('/validate', vouchersController.validateVoucherByCode);
 vouchersRouter.get('/:code', vouchersController.getVoucherByCode);
