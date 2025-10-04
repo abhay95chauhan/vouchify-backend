@@ -12,6 +12,7 @@ import {
   Equal,
   IsNull,
   Not,
+  In,
 } from 'typeorm';
 
 interface QueryOptions<T extends ObjectLiteral> {
@@ -53,6 +54,10 @@ export async function paginateAndSearch<T extends ObjectLiteral>({
         if (value.neq !== undefined) {
           (finalWhere as any)[key] =
             value.neq === null ? Not(IsNull()) : Not(value.neq);
+        }
+
+        if (value.in !== undefined && Array.isArray(value.in)) {
+          (finalWhere as any)[key] = In(value.in);
         }
 
         if (value.gt !== undefined)
