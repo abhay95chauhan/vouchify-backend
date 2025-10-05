@@ -110,7 +110,37 @@ const getAllRedeemedVouchers = catchAsync(
   }
 );
 
+const getVoucherRedeemptionById = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const voucherRedemptionId = req.params.voucherRedemptionId;
+
+    const voucherRedemptionRepo = AppDataSource.getRepository(
+      VoucherRedemptionsEntity
+    );
+    const voucherRedemptionData = await voucherRedemptionRepo.findOne({
+      where: {
+        id: voucherRedemptionId,
+        organization_id: req.user.organization_id,
+      },
+      relations: ['voucher'],
+    });
+
+    if (!voucherRedemptionData) {
+      next(new AppError(errorMessages.voucher.redeemption.error.notFound, 404));
+      return;
+    }
+
+    res.status(201).json({
+      code: 200,
+      message: errorMessages.voucher.redeemption.success.found,
+      status: 'success',
+      data: voucherRedemptionData,
+    });
+  }
+);
+
 export const redeemController = {
   createVoucherRedeemption,
   getAllRedeemedVouchers,
+  getVoucherRedeemptionById,
 };

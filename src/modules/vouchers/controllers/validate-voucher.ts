@@ -2,7 +2,6 @@ import moment from 'moment-timezone';
 import { AppDataSource } from '../../../database';
 import { AppError } from '../../../utils/app-error';
 import { errorMessages } from '../../../utils/error-messages';
-import { UserEntity } from '../../users/entity/entity';
 import { VouchersEntity } from '../entity/entity';
 import { discountType, redeemPerUser } from '../helpers/config';
 import { VoucherRedemptionsEntity } from '../../voucher-redeemption/entity/entity';
