@@ -17,6 +17,7 @@ import subcriptionRouter from './modules/subcriptions/routes/routes';
 import { truncatePublicSchema } from './utils/clear-db';
 import userSessionRouter from './modules/user-sessions/routes/routes';
 import redeemVoucherRouter from './modules/voucher-redeemption/routes/routes';
+import dashboardRouter from './modules/dashboard/routes/routes';
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use(
 
 app.use(helmet());
 
+app.use('/api/v1/dashboard', dashboardRouter);
 app.use('/api/v1/organization', organizationRouter);
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/voucher', vouchersRouter);

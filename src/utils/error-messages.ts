@@ -101,6 +101,11 @@ export const errorMessages = {
       notFound: 'Subcription Not Found',
     },
   },
+  dashboard: {
+    success: {
+      fetch: 'Dashboard Data Fetched',
+    },
+  },
   somethingWrong: 'Something went wrong',
   invalidEmail: 'Invalid Email',
 };
