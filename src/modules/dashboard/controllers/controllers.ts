@@ -77,7 +77,7 @@ const dashboard = catchAsync(
         active_vouchers: activeCount,
         upcoming_vouchers: upcomingCount,
         total_redeemed_vouchers,
-        nearingExpiry,
+        nearing_expiry: nearingExpiry,
         expired_vouchers: expiredCount,
       },
     });

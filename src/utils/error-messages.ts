@@ -39,6 +39,7 @@ export const errorMessages = {
       update: 'Voucher Updated Successfully',
       delete: 'Voucher Deleted Successfully',
       list: 'Vouchers Fetched',
+      recentVoucherFetch: 'Fetched Recent Vouchers',
     },
     error: {
       notFound: 'Voucher Not Found',

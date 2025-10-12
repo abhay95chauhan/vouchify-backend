@@ -222,7 +222,37 @@ const sendVoucherInMail = catchAsync(
   }
 );
 
+const getRecentVouchers = catchAsync(async (req: Request, res: Response) => {
+  const vouchersRepo = AppDataSource.getRepository(VouchersEntity);
+
+  const page = parseInt(req.query.page as string) || 1;
+  const search = (req.query.search as string) || '';
+  const orderBy = (req.query.orderBy as string) || 'DESC';
+  const orderByField = (req.query.orderByField as string) || 'created_at';
+  const filters = (req.body.filters as FindOptionsWhere<VouchersEntity>) || {};
+
+  const { data, pagination } = await paginateAndSearch<VouchersEntity>({
+    repo: vouchersRepo,
+    page: page,
+    limit: 5,
+    search: search,
+    searchFields: ['name', 'code', 'prefix', 'postfix'],
+    where: { organization_id: req.user.organization_id },
+    order: { [orderByField]: orderBy as 'ASC' | 'DESC' }, // ✅ type-checked
+    filters,
+  });
+
+  return res.status(200).json({
+    code: 200,
+    message: errorMessages.voucher.success.recentVoucherFetch,
+    status: 'success',
+    data,
+    pagination,
+  });
+});
+
 export const vouchersController = {
+  getRecentVouchers,
   getAllOrganizationVouchers,
   createOrganizationVoucher,
   getVoucherByCode,
