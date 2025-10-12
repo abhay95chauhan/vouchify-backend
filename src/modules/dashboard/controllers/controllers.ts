@@ -19,7 +19,7 @@ const dashboard = catchAsync(
       where: { organization_id: req.user.organization_id },
     });
 
-    const now = moment()?.format();
+    const now = moment()?.tz(req.user.organization?.timezone)?.format();
 
     // Total vouchers
     const totalCount = await voucherRepo.count({
@@ -53,6 +53,21 @@ const dashboard = catchAsync(
       },
     });
 
+    const nearingExpiry = await voucherRepo.count({
+      where: {
+        organization_id: req.user.organization_id,
+        end_date: LessThan(
+          moment()
+            ?.tz(req.user.organization?.timezone)
+            .add(7, 'days')
+            .toISOString()
+        ),
+        start_date: MoreThan(
+          moment()?.tz(req.user.organization?.timezone).toISOString()
+        ),
+      },
+    });
+
     return res.status(200).json({
       code: 200,
       message: errorMessages.dashboard.success.fetch,
@@ -60,9 +75,10 @@ const dashboard = catchAsync(
       data: {
         total_vouchers: totalCount,
         active_vouchers: activeCount,
-        expired_vouchers: expiredCount,
         upcoming_vouchers: upcomingCount,
         total_redeemed_vouchers,
+        nearingExpiry,
+        expired_vouchers: expiredCount,
       },
     });
   }
