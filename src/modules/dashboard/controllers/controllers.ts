@@ -1,6 +1,6 @@
 // src/vouchers/controllers/voucherDashboard.controller.ts
 
-import { LessThan, MoreThan } from 'typeorm';
+import { LessThan, LessThanOrEqual, MoreThan, MoreThanOrEqual } from 'typeorm';
 import { AppDataSource } from '../../../database';
 import { VouchersEntity } from '../../vouchers/entity/entity';
 import { NextFunction, Request, Response } from 'express';
@@ -15,25 +15,23 @@ const dashboard = catchAsync(
 
     const redeemRepo = AppDataSource.getRepository(VoucherRedemptionsEntity);
 
+    const tz = req.user.organization?.timezone;
+    const now = moment().tz(tz).format(); // ✅ Use Date object, not string
+
     const total_redeemed_vouchers = await redeemRepo.count({
       where: { organization_id: req.user.organization_id },
     });
 
-    const now = moment()?.tz(req.user.organization?.timezone)?.format();
-
-    // Total vouchers
     const totalCount = await voucherRepo.count({
-      where: {
-        organization_id: req.user.organization_id,
-      },
+      where: { organization_id: req.user.organization_id },
     });
 
     // Active vouchers (start_date <= now <= end_date)
     const activeCount = await voucherRepo.count({
       where: {
         organization_id: req.user.organization_id,
-        start_date: LessThan(now),
-        end_date: MoreThan(now),
+        start_date: LessThanOrEqual(now),
+        end_date: MoreThanOrEqual(now),
       },
     });
 
@@ -53,18 +51,12 @@ const dashboard = catchAsync(
       },
     });
 
+    // ✅ Nearing expiry: now <= end_date <= now + 7 days
     const nearingExpiry = await voucherRepo.count({
       where: {
         organization_id: req.user.organization_id,
-        end_date: LessThan(
-          moment()
-            ?.tz(req.user.organization?.timezone)
-            .add(7, 'days')
-            .toISOString()
-        ),
-        start_date: MoreThan(
-          moment()?.tz(req.user.organization?.timezone).toISOString()
-        ),
+        end_date: LessThanOrEqual(moment(now).add(7, 'days').toISOString()),
+        start_date: MoreThanOrEqual(now),
       },
     });
 
