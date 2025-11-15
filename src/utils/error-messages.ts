@@ -38,8 +38,12 @@ export const errorMessages = {
       create: 'Voucher Created Successfully',
       update: 'Voucher Updated Successfully',
       delete: 'Voucher Deleted Successfully',
+      deleteAll: 'All Vouchers Deleted Successfully',
       list: 'Vouchers Fetched',
       recentVoucherFetch: 'Fetched Recent Vouchers',
+      bulkCreate: 'Vouchers Generated Successfully',
+      csvImport: 'Vouchers Imported Successfully',
+      csvExport: 'Vouchers Exported Successfully',
     },
     error: {
       notFound: 'Voucher Not Found',
@@ -51,6 +55,9 @@ export const errorMessages = {
       voucherNotActive: 'Voucher not yet Active',
       voucherExpired: 'Voucher has been Expired',
       voucherLimitExceeded: 'Voucher Redemption Limit Reached',
+      bulkGenerationFailed: 'Failed to generate vouchers',
+      csvImportFailed: 'Failed to import vouchers from CSV',
+      csvExportFailed: 'Failed to export vouchers to CSV',
     },
   },
   smtp: {
