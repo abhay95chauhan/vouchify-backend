@@ -269,126 +269,6 @@ const getRecentVouchers = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const bulkGenerateVouchers = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const {
-      count,
-      prefix = '',
-      suffix = '',
-      length = 8,
-      name,
-      description,
-      discount_type,
-      discount_value,
-      max_redemptions,
-      min_order_amount,
-      start_date,
-      end_date,
-      redeem_limit_per_user,
-      max_discount_amount,
-      eligible_products = [],
-    } = req.body;
-
-    if (!count || count < 1 || count > 1000) {
-      next(
-        new AppError('Count must be between 1 and 1000 vouchers per batch', 400)
-      );
-      return;
-    }
-
-    if (
-      !name ||
-      !discount_type ||
-      !discount_value ||
-      !start_date ||
-      !end_date
-    ) {
-      next(
-        new AppError(
-          'Missing required fields: name, discount_type, discount_value, start_date, end_date',
-          400
-        )
-      );
-      return;
-    }
-
-    if (!discountType.includes(discount_type)) {
-      next(
-        new AppError('Invalid discount_type. Must be Fixed or Percentage', 400)
-      );
-      return;
-    }
-
-    if (length < 4 || length > 20) {
-      next(new AppError('Length must be between 4 and 20 characters', 400));
-      return;
-    }
-
-    const voucherRepo = AppDataSource.getRepository(VouchersEntity);
-
-    // Get existing codes to avoid duplicates
-    const existingVouchers = await voucherRepo.find({
-      where: { organization_id: req.user.organization_id },
-      select: ['code'],
-    });
-    const existingCodes = new Set(existingVouchers.map((v) => v.code));
-
-    // Generate unique voucher codes
-    const codes = generateBulkVoucherCodes(
-      count,
-      prefix,
-      suffix,
-      length,
-      existingCodes
-    );
-
-    // Prepare vouchers data for bulk insert
-    const vouchersData = codes.map((code) => ({
-      name: `${name} - ${code}`,
-      description,
-      code,
-      prefix,
-      postfix: suffix,
-      discount_type,
-      discount_value: parseInt(discount_value),
-      max_redemptions: max_redemptions ? parseInt(max_redemptions) : null,
-      min_order_amount: min_order_amount ? parseInt(min_order_amount) : 0,
-      start_date,
-      end_date,
-      redeem_limit_per_user: redeem_limit_per_user || redeemPerUser[1],
-      max_discount_amount: max_discount_amount
-        ? parseInt(max_discount_amount)
-        : null,
-      eligible_products: Array.isArray(eligible_products)
-        ? eligible_products
-        : [],
-      organization_id: req.user.organization_id,
-    }));
-
-    // Bulk insert vouchers using TypeORM insert (more efficient than save)
-    await voucherRepo.insert(vouchersData);
-
-    // Fetch the inserted vouchers to return in response
-    const savedVouchers = await voucherRepo.find({
-      where: {
-        organization_id: req.user.organization_id,
-        code: In(codes),
-      },
-      order: { created_at: 'DESC' },
-    });
-
-    return res.status(201).json({
-      code: 201,
-      message: errorMessages.voucher.success.bulkCreate,
-      status: 'success',
-      data: {
-        count: savedVouchers.length,
-        vouchers: savedVouchers,
-      },
-    });
-  }
-);
-
 const importVouchersFromCSV = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const file = (req as any).file;
@@ -637,7 +517,6 @@ export const vouchersController = {
   deleteOrganizationVoucher,
   validateVoucherByCode,
   sendVoucherInMail,
-  bulkGenerateVouchers,
   importVouchersFromCSV,
   exportVouchersToCSV,
   deleteAllOrganizationVouchers,

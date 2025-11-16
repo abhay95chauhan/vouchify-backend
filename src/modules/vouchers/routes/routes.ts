@@ -13,8 +13,6 @@ vouchersRouter.post('/', vouchersController.createOrganizationVoucher);
 vouchersRouter.post('/validate', vouchersController.validateVoucherByCode);
 vouchersRouter.post('/send-mail', vouchersController.sendVoucherInMail);
 
-// Bulk operations - must be before parameterized routes
-vouchersRouter.post('/list/generate', vouchersController.bulkGenerateVouchers);
 vouchersRouter.post(
   '/list/import',
   upload.single('file'),
